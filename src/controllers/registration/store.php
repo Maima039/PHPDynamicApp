@@ -14,7 +14,7 @@ if (!Validator::email($email)) {
     $errors['email'] = 'Plz check your email address';
 }
 
-if (!Validator::string($password, 7, 10)) {
+if (!Validator::string($password, 7, 275)) {
     $errors['password'] = 'Plz provide a valid pwd';
 }
 
@@ -27,22 +27,24 @@ if (!empty($errors)) {
 // check if user exists
 $db = App::resolve(Database::class);
 
-$res = $db->query('select * from user where email= :email', [
+$user = $db->query('select * from user where email= :email', [
     'email' => $email
 ])->find();
 
 if ($user) {
     // yes, redirect to login
-    header('location:/');
+    header('location: /login');
+    exit();
 } else {
     // no, register to database
     $db->query('INSERT INTO user(email, password) VALUES(:email, :password)', [
         'email' => $email,
-        'password' => $password
+        'password' => password_hash($password, PASSWORD_BCRYPT)
     ]);
     // mark that the user has logged in
     $_SESSION['user'] = ['email' => $email];
+    $_SESSION['name']='Miranda';
+    login($user);
+    header('location:/');
+    exit();
 }
-
-header('location:/');
-exit();

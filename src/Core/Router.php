@@ -55,11 +55,17 @@ class Router
             if ($route['uri'] === $uri && $route['method'] === strtoupper($method)) {
                 // apply the middleware
                 Middleware::resolve($route['middleware']);
-                return require base_path($route['controller']);
+                return require base_path('Http/controllers/' . $route['controller']);
             }
         }
         $this->abort();
     }
+
+    public function previousUrl(){
+        return $_SERVER['HTTP_REFERER'];
+    }
+
+
     protected function abort($code = 404)
     {
         http_response_code($code);
